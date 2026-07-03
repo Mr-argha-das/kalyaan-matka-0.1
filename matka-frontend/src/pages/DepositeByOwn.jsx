@@ -13,6 +13,10 @@ export default function DepositeByOwn() {
     () => localStorage.getItem("add_amount") || ""
   );
 
+  const minDeposit = Number(settings?.min_deposit ?? 0);
+  const amountValue = Number(amount || 0);
+  const isAmountInvalid = !amount || amountValue < minDeposit;
+
   useEffect(() => {
     localStorage.setItem("add_amount", amount);
   }, [amount]);
@@ -24,8 +28,8 @@ export default function DepositeByOwn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!amount || Number(amount) < settings?.min_deposit) {
-      showPopup("error", `Minimum deposit is Rs ${settings?.min_deposit}`);
+    if (isAmountInvalid) {
+      showPopup("error", `Minimum deposit is Rs ${minDeposit}`);
       return;
     }
 
@@ -135,15 +139,11 @@ export default function DepositeByOwn() {
         </div>
 
         <button
-          disabled={
-            loading ||
-            !settings?.min_deposit ||
-            amount < settings?.min_deposit
-          }
+          disabled={loading || !settings || isAmountInvalid}
           className={`w-full bg-gradient-to-tl
             from-[#212b61] to-[#79049a] text-white font-semibold py-2 rounded-lg flex items-center justify-center transition
             ${
-              loading || amount < settings?.min_deposit
+              loading || !settings || isAmountInvalid
                 ? "opacity-50 cursor-not-allowed"
                 : "hover:bg-purple-800"
             }`}
