@@ -1,0 +1,240 @@
+@import "tailwindcss";
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
+  background-color: #000;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Enable scroll only on the main content wrapper */
+#root,
+.app-container {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* 
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button:hover {
+  border-color: #646cff;
+} */
+
+/* button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+} */
+
+@media (prefers-color-scheme: dark) {
+}
+
+/* Bottom Nav */
+
+/* Container for fixed positioning */
+.bottom-nav-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+  /* Adjust max-width as needed for your app's layout */
+  max-width: 448px;
+  margin: 0 auto;
+}
+
+/* --- Main Navigation Bar Styling --- */
+
+.bottom-nav-bar {
+  /* Set a fixed height and the desired width */
+  width: 100%;
+  max-width: 448px; /* Matching the container max-width */
+  height: 60px; /* Height of the main bar section */
+
+  /* Background style from the image */
+  background-color: #1a1a2e; /* A dark, slightly purplish-black */
+  backdrop-filter: blur(15px); /* Mimics the backdrop-blur */
+
+  /* Rounded top corners */
+  border-top-left-radius: 25px;
+  border-top-right-radius: 25px;
+
+  /* Flexbox to arrange items */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30px; /* Horizontal padding for the icons */
+
+  /* Shadow is subtle in the original, you can adjust */
+  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);
+
+  /* Crucial: Relative positioning for absolute children */
+  position: relative;
+}
+
+/* --- Icon Groups --- */
+.nav-icons-group {
+  display: flex;
+  align-items: center;
+  gap: 40px; /* Spacing between the icons, adjusted to fit the layout */
+  color: #a0a0a0; /* Gray color for inactive icons */
+}
+
+.nav-icon {
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.nav-icon:hover {
+  color: #ffffff;
+}
+
+/* --- Center Home Button Styling --- */
+
+/* This is the container for the button which must be absolutely positioned */
+.nav-center-placeholder {
+  /* Absolute position to center the button */
+  position: absolute;
+  top: -30px; /* Half the button height to make it stick out */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60; /* Higher z-index to be on top */
+}
+
+.nav-center-button-wrapper {
+  /* No default styles, just a wrapper for the link */
+}
+
+.nav-center-button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+
+  /* The purple/pink gradient from the image */
+  background: linear-gradient(135deg, #79049a, #212b61);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* Shadow for the floating effect */
+  box-shadow: 0 4px 15px rgba(121, 4, 154, 0.6);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.nav-center-button:hover {
+  transform: scale(1.05);
+}
+
+.nav-icon-home {
+  color: white;
+}
+
+/* --- Creating the Custom Curvature (Inward Notch Effect) --- */
+/* The key to the design: creating the illusion of a notch */
+
+/* The two crescent elements placed on the sides of the floating button */
+
+.bottom-nav-bar::before,
+.bottom-nav-bar::after {
+  content: "";
+  position: absolute;
+  top: 0px;
+  width: 25px;
+  height: 25px;
+  background-color: transparent; /* Makes the main bar invisible here */
+  box-shadow: 0 0 0 40px #fff;
+  z-index: 40; /* Lower than the nav-center-placeholder */
+}
+
+/* Left crescent */
+.bottom-nav-bar::before {
+  left: calc(50% - 30px - 25px);
+  border-top-right-radius: 50%; /* Inward curve */
+}
+
+/* Right crescent */
+.bottom-nav-bar::after {
+  right: calc(
+    50% - 30px - 25px
+  ); /* Center point - half button width - width of this element */
+  border-top-left-radius: 50%; /* Inward curve */
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeInOut 12s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* .animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+} */
