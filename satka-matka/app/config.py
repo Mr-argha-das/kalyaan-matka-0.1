@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     WATCHPAYS_MERCHANT_ID: str = "100555332"
     WATCHPAYS_PAYIN_API_KEY: str = "7aa2fa8c2f7f9cd34e6054463bdedcfd"
     WATCHPAYS_CALLBACK_URL: str = "http://127.0.0.1:8000/payment/watchpays/callback"
-    CORS_ORIGINS: str = "https://game.kalyanratan777.com,http://localhost:5173,http://127.0.0.1:5173"
+    CORS_ORIGINS: str = "https://game.natraj777.com,http://localhost:5173,http://127.0.0.1:5173"
 
     class Config:
         env_file = ".env"

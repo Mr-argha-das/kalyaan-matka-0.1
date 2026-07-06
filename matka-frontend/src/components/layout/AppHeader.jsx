@@ -71,7 +71,7 @@ export default function AppHeader({ setSidebar }) {
             <Menu size={26} />
           </button>
           {/* <img src="/logo.png" alt="Logo" className="w-8 h-8" /> */}
-          <h1 className="text-white text-lg font-bold">KalyanRatan777</h1>
+          <h1 className="text-white text-lg font-bold">Natraj777</h1>
         </div>
         <div className="flex items-center gap-3">
           <button className="flex font-medium items-center gap-2 text-white py-0.5 px-1 text-sm rounded-md border-[0.5px] border-white hover:bg-gray-700 transition duration-150">
