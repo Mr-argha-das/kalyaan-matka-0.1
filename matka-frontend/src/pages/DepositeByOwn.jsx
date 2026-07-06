@@ -3,6 +3,9 @@ import axios from "axios";
 import { Loader2Icon } from "lucide-react";
 import { API_URL } from "../config";
 
+const MAX_DEPOSIT_AMOUNT = 300;
+const QUICK_AMOUNTS = [300];
+
 export default function DepositeByOwn() {
 
   const [loading, setLoading] = useState(false);
@@ -15,7 +18,8 @@ export default function DepositeByOwn() {
 
   const minDeposit = Number(settings?.min_deposit ?? 0);
   const amountValue = Number(amount || 0);
-  const isAmountInvalid = !amount || amountValue < minDeposit;
+  const isAmountInvalid =
+    !amount || amountValue < minDeposit || amountValue > MAX_DEPOSIT_AMOUNT;
 
   useEffect(() => {
     localStorage.setItem("add_amount", amount);
@@ -29,6 +33,11 @@ export default function DepositeByOwn() {
     e.preventDefault();
 
     if (isAmountInvalid) {
+      if (amountValue > MAX_DEPOSIT_AMOUNT) {
+        showPopup("error", `Maximum deposit is Rs ${MAX_DEPOSIT_AMOUNT}`);
+        return;
+      }
+
       showPopup("error", `Minimum deposit is Rs ${minDeposit}`);
       return;
     }
@@ -112,16 +121,24 @@ export default function DepositeByOwn() {
 
         <input
           type="number"
-          placeholder={`Add amount (Min Rs ${settings?.min_deposit})`}
+          max={MAX_DEPOSIT_AMOUNT}
+          placeholder={`Add amount (Max Rs ${MAX_DEPOSIT_AMOUNT})`}
           value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          onChange={(e) => {
+            const nextAmount = e.target.value;
+            if (Number(nextAmount) > MAX_DEPOSIT_AMOUNT) {
+              setAmount(String(MAX_DEPOSIT_AMOUNT));
+              return;
+            }
+            setAmount(nextAmount);
+          }}
           className="w-full bg-transparent text-gray-200 py-2 px-4 rounded-md border
            border-gray-50/15 focus:ring focus:ring-[#b00fdc] outline-none mb-3"
         />
 
         <div className="grid grid-cols-3 gap-3 mb-4">
 
-          {[300, 500, 1000, 2000, 5000].map((amt) => (
+          {QUICK_AMOUNTS.map((amt) => (
 
             <button
               key={amt}
