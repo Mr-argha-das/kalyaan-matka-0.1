@@ -12,6 +12,8 @@ from ...auth import get_current_user, require_admin
 from ...models import DepositQR, Transaction, Wallet, User, Withdrawal
 
 router = APIRouter(prefix="/user-deposit-withdrawal", tags=["Deposit Withdrawal"])
+REQUIRED_DEPOSIT_AMOUNT = 300
+REQUIRED_WITHDRAW_AMOUNT = 300
 
 # Directory for uploaded deposit images
 UPLOAD_DIR = "uploads/deposit_qr"
@@ -33,6 +35,12 @@ async def upload_qr(
     # Validate amount
     if amount <= 0:
         raise HTTPException(400, "Amount must be positive")
+
+    if amount < REQUIRED_DEPOSIT_AMOUNT:
+        raise HTTPException(400, "Minimum deposit amount 300")
+
+    if amount > REQUIRED_DEPOSIT_AMOUNT:
+        raise HTTPException(400, "Maximum deposit amount 300")
 
     # Validate method
     if not method:
@@ -241,6 +249,12 @@ def request_withdraw(
     # Basic validations
     if amount <= 0:
         raise HTTPException(400, "Amount must be positive")
+
+    if amount < REQUIRED_WITHDRAW_AMOUNT:
+        raise HTTPException(400, "Minimum withdrawal amount 300")
+
+    if amount > REQUIRED_WITHDRAW_AMOUNT:
+        raise HTTPException(400, "Maximum withdrawal amount 300")
 
     if wallet.balance < amount:
         raise HTTPException(400, "Insufficient balance")

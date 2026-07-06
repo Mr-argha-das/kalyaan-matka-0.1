@@ -15,6 +15,7 @@ from ..config import settings
 from ..models import Transaction, Wallet
 
 router = APIRouter(prefix="/payment/watchpays", tags=["WatchPays"])
+REQUIRED_DEPOSIT_AMOUNT = Decimal("300.00")
 
 
 class WatchPaysCreateRequest(BaseModel):
@@ -29,6 +30,12 @@ def format_amount(amount: float) -> str:
 
     if value <= 0:
         raise HTTPException(400, "Amount must be positive")
+
+    if value < REQUIRED_DEPOSIT_AMOUNT:
+        raise HTTPException(400, "Minimum deposit amount 300")
+
+    if value > REQUIRED_DEPOSIT_AMOUNT:
+        raise HTTPException(400, "Maximum deposit amount 300")
 
     return f"{value:.2f}"
 

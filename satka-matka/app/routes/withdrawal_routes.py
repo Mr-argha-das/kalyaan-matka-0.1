@@ -6,6 +6,7 @@ from ..models import Withdrawal
 from ..auth import get_current_user, require_admin
 
 router = APIRouter(prefix="/withdraw")
+REQUIRED_WITHDRAW_AMOUNT = 300
 
 
 def get_or_create_wallet(user_id: str):
@@ -26,6 +27,12 @@ def request_withdraw(
 
     if amount <= 0:
         raise HTTPException(400, "Amount must be positive")
+
+    if amount < REQUIRED_WITHDRAW_AMOUNT:
+        raise HTTPException(400, "Minimum withdrawal amount 300")
+
+    if amount > REQUIRED_WITHDRAW_AMOUNT:
+        raise HTTPException(400, "Maximum withdrawal amount 300")
 
     if wallet.balance < amount:
         raise HTTPException(400, "Insufficient balance")

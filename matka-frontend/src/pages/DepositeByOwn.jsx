@@ -3,7 +3,7 @@ import axios from "axios";
 import { Loader2Icon } from "lucide-react";
 import { API_URL } from "../config";
 
-const MAX_DEPOSIT_AMOUNT = 300;
+const REQUIRED_DEPOSIT_AMOUNT = 300;
 const QUICK_AMOUNTS = [300];
 
 export default function DepositeByOwn() {
@@ -16,10 +16,15 @@ export default function DepositeByOwn() {
     () => localStorage.getItem("add_amount") || ""
   );
 
-  const minDeposit = Number(settings?.min_deposit ?? 0);
   const amountValue = Number(amount || 0);
+  const amountValidationMessage =
+    amount && amountValue < REQUIRED_DEPOSIT_AMOUNT
+      ? `Minimum deposit amount ₹${REQUIRED_DEPOSIT_AMOUNT}`
+      : amount && amountValue > REQUIRED_DEPOSIT_AMOUNT
+        ? `Maximum deposit amount ₹${REQUIRED_DEPOSIT_AMOUNT}`
+        : "";
   const isAmountInvalid =
-    !amount || amountValue < minDeposit || amountValue > MAX_DEPOSIT_AMOUNT;
+    !amount || amountValue !== REQUIRED_DEPOSIT_AMOUNT;
 
   useEffect(() => {
     localStorage.setItem("add_amount", amount);
@@ -29,16 +34,30 @@ export default function DepositeByOwn() {
     alert(message);
   };
 
+  const getErrorMessage = (error) => {
+    const detail = error?.response?.data?.detail;
+
+    if (typeof detail === "string") {
+      return detail;
+    }
+
+    if (detail && typeof detail === "object") {
+      return detail.message || detail.error || JSON.stringify(detail);
+    }
+
+    return error?.message || "Payment gateway error!";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (isAmountInvalid) {
-      if (amountValue > MAX_DEPOSIT_AMOUNT) {
-        showPopup("error", `Maximum deposit is Rs ${MAX_DEPOSIT_AMOUNT}`);
+      if (amountValue > REQUIRED_DEPOSIT_AMOUNT) {
+        showPopup("error", `Maximum deposit amount ₹${REQUIRED_DEPOSIT_AMOUNT}`);
         return;
       }
 
-      showPopup("error", `Minimum deposit is Rs ${minDeposit}`);
+      showPopup("error", `Minimum deposit amount ₹${REQUIRED_DEPOSIT_AMOUNT}`);
       return;
     }
 
@@ -74,7 +93,7 @@ export default function DepositeByOwn() {
       console.log(error);
       showPopup(
         "error",
-        error?.response?.data?.detail || "Payment gateway error!"
+        getErrorMessage(error)
       );
 
     }
@@ -121,20 +140,23 @@ export default function DepositeByOwn() {
 
         <input
           type="number"
-          max={MAX_DEPOSIT_AMOUNT}
-          placeholder={`Add amount (Max Rs ${MAX_DEPOSIT_AMOUNT})`}
+          min={REQUIRED_DEPOSIT_AMOUNT}
+          max={REQUIRED_DEPOSIT_AMOUNT}
+          placeholder={`Deposit amount must be ₹${REQUIRED_DEPOSIT_AMOUNT}`}
           value={amount}
-          onChange={(e) => {
-            const nextAmount = e.target.value;
-            if (Number(nextAmount) > MAX_DEPOSIT_AMOUNT) {
-              setAmount(String(MAX_DEPOSIT_AMOUNT));
-              return;
-            }
-            setAmount(nextAmount);
-          }}
-          className="w-full bg-transparent text-gray-200 py-2 px-4 rounded-md border
-           border-gray-50/15 focus:ring focus:ring-[#b00fdc] outline-none mb-3"
+          onChange={(e) => setAmount(e.target.value)}
+          className={`w-full bg-transparent text-gray-200 py-2 px-4 rounded-md border
+           ${
+             amountValidationMessage
+               ? "border-red-400/70"
+               : "border-gray-50/15"
+           } focus:ring focus:ring-[#b00fdc] outline-none`}
         />
+        {amountValidationMessage && (
+          <p className="mt-2 mb-3 text-xs font-medium text-red-300">
+            {amountValidationMessage}
+          </p>
+        )}
 
         <div className="grid grid-cols-3 gap-3 mb-4">
 

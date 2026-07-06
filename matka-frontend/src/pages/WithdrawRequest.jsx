@@ -1,40 +1,18 @@
 import React, { useState, useEffect } from "react";
 import {
   Loader2,
-  DollarSign,
   User2,
   History,
-  DollarSignIcon,
   ArrowLeft,
-  HistoryIcon,
-  Phone,
 } from "lucide-react";
 import { API_URL } from "../config";
 import axios from "axios";
 import { getUserById } from "../components/layout/fetchUser";
 
 const API_BASE_URL = API_URL; // Replace with your actual base URL
+const REQUIRED_WITHDRAW_AMOUNT = 300;
 
 const getAuthToken = () => localStorage.getItem("accessToken");
-
-// Utility function to get user ID from a basic JWT structure (header.payload.signature)
-const getUserIdFromToken = () => {
-  const token = getAuthToken();
-  if (token) {
-    try {
-      // Decode the payload (second part of the JWT)
-      const payloadBase64 = token.split(".")[1];
-      // atob is used for base64 decoding in the browser
-      const decodedPayload = JSON.parse(atob(payloadBase64));
-      // Assuming 'sub' (subject) or 'id' holds the user ID
-      return decodedPayload.sub || decodedPayload.id || "User ID Not Found";
-    } catch (e) {
-      // console.error("Failed to decode token:", e);
-      return "Not Logged In";
-    }
-  }
-  return "Not Logged In";
-};
 
 export default function WithdrawRequest() {
   const [amount, setAmount] = useState("");
@@ -47,9 +25,6 @@ export default function WithdrawRequest() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [currentBalance, setCurrentBalance] = useState(null);
-  const [minWithdraw, setMinWithdraw] = useState(200);
-  const [currentUserId, setCurrentUserId] = useState(null);
-  const [showTermsModal, setShowTermsModal] = useState(false);
   const [siteData, setSiteData] = useState(null);
 
   useEffect(() => {
@@ -59,24 +34,6 @@ export default function WithdrawRequest() {
       console.log(res?.data);
       setSiteData(res.data);
     };
-
-    load();
-  }, []);
-
-  const [settings, setSettings] = useState(null);
-
-  useEffect(() => {
-    async function load() {
-      const res = await axios.get(`${API_URL}/settings/get`);
-
-      // console.log(res);
-      setSettings(res?.data);
-      if (error) {
-        console.log("Settings API Error:", error);
-      } else {
-        setSettings(data);
-      }
-    }
 
     load();
   }, []);
@@ -102,13 +59,20 @@ export default function WithdrawRequest() {
   };
 
   useEffect(() => {
-    setCurrentUserId(getUserIdFromToken());
     fetchBalance();
   }, []);
 
   const userId = localStorage.getItem("userId");
   const [user, setUser] = useState(null);
-  const [error, setError] = useState(null);
+  const withdrawAmountValue = Number(amount || 0);
+  const amountValidationMessage =
+    amount && withdrawAmountValue < REQUIRED_WITHDRAW_AMOUNT
+      ? `Minimum withdrawal amount ₹${REQUIRED_WITHDRAW_AMOUNT}`
+      : amount && withdrawAmountValue > REQUIRED_WITHDRAW_AMOUNT
+        ? `Maximum withdrawal amount ₹${REQUIRED_WITHDRAW_AMOUNT}`
+        : "";
+  const isAmountInvalid =
+    !amount || withdrawAmountValue !== REQUIRED_WITHDRAW_AMOUNT;
 
   // console.log(user);
   useEffect(() => {
@@ -116,7 +80,7 @@ export default function WithdrawRequest() {
       const { data, error } = await getUserById(userId);
 
       if (error) {
-        setError(error);
+        console.log("User fetch error:", error);
       } else {
         setUser(data);
       }
@@ -138,10 +102,18 @@ export default function WithdrawRequest() {
 
     const withdrawAmount = parseFloat(amount);
 
-    if (withdrawAmount <= minWithdraw) {
+    if (withdrawAmount < REQUIRED_WITHDRAW_AMOUNT) {
       setMessage({
         type: "error",
-        text: `Minimum withdrawal is ₹${minWithdraw}.`,
+        text: `Minimum withdrawal amount ₹${REQUIRED_WITHDRAW_AMOUNT}`,
+      });
+      return;
+    }
+
+    if (withdrawAmount > REQUIRED_WITHDRAW_AMOUNT) {
+      setMessage({
+        type: "error",
+        text: `Maximum withdrawal amount ₹${REQUIRED_WITHDRAW_AMOUNT}`,
       });
       return;
     }
@@ -259,7 +231,7 @@ export default function WithdrawRequest() {
           {currentBalance?.toFixed(2)}
         </p>
         <p className="text-xs mt-1 text-gray-400">
-          Minimum Withdrawal: ₹{settings?.min_withdraw}
+          Withdrawal Amount: ₹{REQUIRED_WITHDRAW_AMOUNT}
         </p>
       </div>
 
@@ -289,13 +261,23 @@ export default function WithdrawRequest() {
           <input
             type="number"
             id="amount"
-            placeholder={`Min ₹${settings?.min_withdraw}`}
+            placeholder={`Withdrawal amount must be ₹${REQUIRED_WITHDRAW_AMOUNT}`}
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full p-3 rounded-lg  border border-gray-700 text-white focus:ring-purple-500 focus:border-purple-500"
-            min={minWithdraw}
+            className={`w-full p-3 rounded-lg border text-white focus:ring-purple-500 focus:border-purple-500 ${
+              amountValidationMessage
+                ? "border-red-400/70"
+                : "border-gray-700"
+            }`}
+            min={REQUIRED_WITHDRAW_AMOUNT}
+            max={REQUIRED_WITHDRAW_AMOUNT}
             disabled={loading}
           />
+          {amountValidationMessage && (
+            <p className="mt-2 text-xs font-medium text-red-300">
+              {amountValidationMessage}
+            </p>
+          )}
         </div>
 
         {/* Payment Method Selection */}
@@ -395,8 +377,8 @@ export default function WithdrawRequest() {
           type="submit"
           disabled={
             loading ||
-            amount < settings?.min_withdraw ||
-            amount > currentBalance ||
+            isAmountInvalid ||
+            withdrawAmountValue > currentBalance ||
             (method !== "Bank Transfer"
               ? !number
               : !bankholderName || !account || !ifsc) // Bank Transfer validation
