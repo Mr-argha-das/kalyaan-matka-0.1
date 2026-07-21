@@ -31,9 +31,6 @@ def request_withdraw(
     if amount < REQUIRED_WITHDRAW_AMOUNT:
         raise HTTPException(400, "Minimum withdrawal amount 300")
 
-    if amount > REQUIRED_WITHDRAW_AMOUNT:
-        raise HTTPException(400, "Maximum withdrawal amount 300")
-
     if wallet.balance < amount:
         raise HTTPException(400, "Insufficient balance")
 

@@ -39,9 +39,6 @@ async def upload_qr(
     if amount < REQUIRED_DEPOSIT_AMOUNT:
         raise HTTPException(400, "Minimum deposit amount 300")
 
-    if amount > REQUIRED_DEPOSIT_AMOUNT:
-        raise HTTPException(400, "Maximum deposit amount 300")
-
     # Validate method
     if not method:
         raise HTTPException(400, "Method is required")
@@ -252,9 +249,6 @@ def request_withdraw(
 
     if amount < REQUIRED_WITHDRAW_AMOUNT:
         raise HTTPException(400, "Minimum withdrawal amount 300")
-
-    if amount > REQUIRED_WITHDRAW_AMOUNT:
-        raise HTTPException(400, "Maximum withdrawal amount 300")
 
     if wallet.balance < amount:
         raise HTTPException(400, "Insufficient balance")

@@ -34,9 +34,6 @@ def format_amount(amount: float) -> str:
     if value < REQUIRED_DEPOSIT_AMOUNT:
         raise HTTPException(400, "Minimum deposit amount 300")
 
-    if value > REQUIRED_DEPOSIT_AMOUNT:
-        raise HTTPException(400, "Maximum deposit amount 300")
-
     return f"{value:.2f}"
 
 

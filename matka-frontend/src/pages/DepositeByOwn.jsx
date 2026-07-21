@@ -20,11 +20,9 @@ export default function DepositeByOwn() {
   const amountValidationMessage =
     amount && amountValue < REQUIRED_DEPOSIT_AMOUNT
       ? `Minimum deposit amount ₹${REQUIRED_DEPOSIT_AMOUNT}`
-      : amount && amountValue > REQUIRED_DEPOSIT_AMOUNT
-        ? `Maximum deposit amount ₹${REQUIRED_DEPOSIT_AMOUNT}`
-        : "";
+      : "";
   const isAmountInvalid =
-    !amount || amountValue !== REQUIRED_DEPOSIT_AMOUNT;
+    !amount || amountValue < REQUIRED_DEPOSIT_AMOUNT;
 
   useEffect(() => {
     localStorage.setItem("add_amount", amount);
@@ -52,11 +50,6 @@ export default function DepositeByOwn() {
     e.preventDefault();
 
     if (isAmountInvalid) {
-      if (amountValue > REQUIRED_DEPOSIT_AMOUNT) {
-        showPopup("error", `Maximum deposit amount ₹${REQUIRED_DEPOSIT_AMOUNT}`);
-        return;
-      }
-
       showPopup("error", `Minimum deposit amount ₹${REQUIRED_DEPOSIT_AMOUNT}`);
       return;
     }
@@ -141,8 +134,7 @@ export default function DepositeByOwn() {
         <input
           type="number"
           min={REQUIRED_DEPOSIT_AMOUNT}
-          max={REQUIRED_DEPOSIT_AMOUNT}
-          placeholder={`Deposit amount must be ₹${REQUIRED_DEPOSIT_AMOUNT}`}
+          placeholder={`Deposit amount must be at least ₹${REQUIRED_DEPOSIT_AMOUNT}`}
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           className={`w-full bg-transparent text-gray-200 py-2 px-4 rounded-md border

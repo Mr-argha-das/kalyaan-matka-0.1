@@ -68,11 +68,9 @@ export default function WithdrawRequest() {
   const amountValidationMessage =
     amount && withdrawAmountValue < REQUIRED_WITHDRAW_AMOUNT
       ? `Minimum withdrawal amount ₹${REQUIRED_WITHDRAW_AMOUNT}`
-      : amount && withdrawAmountValue > REQUIRED_WITHDRAW_AMOUNT
-        ? `Maximum withdrawal amount ₹${REQUIRED_WITHDRAW_AMOUNT}`
-        : "";
+      : "";
   const isAmountInvalid =
-    !amount || withdrawAmountValue !== REQUIRED_WITHDRAW_AMOUNT;
+    !amount || withdrawAmountValue < REQUIRED_WITHDRAW_AMOUNT;
 
   // console.log(user);
   useEffect(() => {
@@ -106,14 +104,6 @@ export default function WithdrawRequest() {
       setMessage({
         type: "error",
         text: `Minimum withdrawal amount ₹${REQUIRED_WITHDRAW_AMOUNT}`,
-      });
-      return;
-    }
-
-    if (withdrawAmount > REQUIRED_WITHDRAW_AMOUNT) {
-      setMessage({
-        type: "error",
-        text: `Maximum withdrawal amount ₹${REQUIRED_WITHDRAW_AMOUNT}`,
       });
       return;
     }
@@ -231,7 +221,7 @@ export default function WithdrawRequest() {
           {currentBalance?.toFixed(2)}
         </p>
         <p className="text-xs mt-1 text-gray-400">
-          Withdrawal Amount: ₹{REQUIRED_WITHDRAW_AMOUNT}
+          Minimum withdrawal amount: ₹{REQUIRED_WITHDRAW_AMOUNT}
         </p>
       </div>
 
@@ -261,7 +251,7 @@ export default function WithdrawRequest() {
           <input
             type="number"
             id="amount"
-            placeholder={`Withdrawal amount must be ₹${REQUIRED_WITHDRAW_AMOUNT}`}
+            placeholder={`Withdrawal amount must be at least ₹${REQUIRED_WITHDRAW_AMOUNT}`}
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             className={`w-full p-3 rounded-lg border text-white focus:ring-purple-500 focus:border-purple-500 ${
@@ -270,7 +260,6 @@ export default function WithdrawRequest() {
                 : "border-gray-700"
             }`}
             min={REQUIRED_WITHDRAW_AMOUNT}
-            max={REQUIRED_WITHDRAW_AMOUNT}
             disabled={loading}
           />
           {amountValidationMessage && (
